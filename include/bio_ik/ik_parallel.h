@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include "ik_base.h"
+#include "bio_ik/ik_base.h"
 
 #include <boost/thread/barrier.hpp>
 
@@ -157,7 +157,7 @@ private:
         }
 
         // run solver iterations until solution found or timeout
-        for(size_t iteration = 0; (ros::WallTime::now().toSec() < timeout && finished == 0) || (iteration == 0 && i == 0); iteration++)
+        for(size_t iteration = 0; (rclcpp::Clock().now().seconds() < timeout && finished == 0) || (iteration == 0 && i == 0); iteration++)
         {
             if(finished) break;
 
@@ -165,7 +165,7 @@ private:
             solvers[i]->step();
             iteration_count++;
             for(int it2 = 1; it2 < 4; it2++)
-                if(ros::WallTime::now().toSec() < timeout && finished == 0) solvers[i]->step();
+                if(rclcpp::Clock().now().seconds() < timeout && finished == 0) solvers[i]->step();
 
             if(finished) break;
 

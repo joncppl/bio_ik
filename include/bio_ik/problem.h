@@ -41,8 +41,7 @@
 
 #include <geometric_shapes/shapes.h>
 
-#include <moveit/collision_detection/collision_robot.h>
-#include <moveit/collision_detection_fcl/collision_robot_fcl.h>
+#include <moveit/collision_detection_fcl/collision_common.h>
 
 #include <bio_ik/goal.h>
 
