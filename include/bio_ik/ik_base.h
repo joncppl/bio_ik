@@ -76,9 +76,11 @@ struct Random
     const double* make_random_buffer()
     {
         static std::vector<double> buf;
-        buf.resize(random_buffer_size);
-        for(auto& r : buf)
+        if (buf.size() != random_buffer_size) {
+          buf.resize(random_buffer_size);
+          for (auto& r : buf)
             r = random();
+        }
         return buf.data();
     }
     const double* random_buffer;
@@ -94,9 +96,11 @@ struct Random
     {
         // LOG("make_random_gauss_buffer");
         static std::vector<double> buf;
-        buf.resize(random_buffer_size);
-        for(auto& r : buf)
+        if (buf.size() != random_buffer_size) {
+          buf.resize(random_buffer_size);
+          for (auto& r : buf)
             r = random_gauss();
+        }
         return buf.data();
     }
     const double* random_gauss_buffer;
