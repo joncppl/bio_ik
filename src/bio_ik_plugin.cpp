@@ -24,7 +24,7 @@ bool BioIKKinematicsPlugin::initialize(const rclcpp::Node::SharedPtr& node, cons
 
   node_ = node;
 
-  RCLCPP_INFO_STREAM(LOGGER, "bio ik init " << node_->get_name());
+  RCLCPP_INFO_STREAM(LOGGER, "Initializing BioIK for group \"" << group_name << "\"");
 
   storeValues(robot_model, group_name, base_frame, tip_frames, search_discretization);
   joint_model_group = robot_model_->getJointModelGroup(group_name);
@@ -139,6 +139,8 @@ bool BioIKKinematicsPlugin::initialize(const rclcpp::Node::SharedPtr& node, cons
   }
 
   // LOG("init ready");
+
+  RCLCPP_INFO_STREAM(LOGGER, "Finished initializing BioIK for group \"" << group_name << "\"");
 
   return true;
 }
