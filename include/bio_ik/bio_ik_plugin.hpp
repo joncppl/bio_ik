@@ -67,27 +67,27 @@
 
 namespace bio_ik {
 
-std::mutex bioIKKinematicsQueryOptionsMutex;
-std::unordered_set<const void *> bioIKKinematicsQueryOptionsList;
+extern std::mutex bioIKKinematicsQueryOptionsMutex;
+extern std::unordered_set<const void *> bioIKKinematicsQueryOptionsList;
 
-BioIKKinematicsQueryOptions::BioIKKinematicsQueryOptions()
+inline BioIKKinematicsQueryOptions::BioIKKinematicsQueryOptions()
     : replace(false), solution_fitness(0) {
   std::lock_guard<std::mutex> lock(bioIKKinematicsQueryOptionsMutex);
   bioIKKinematicsQueryOptionsList.insert(this);
 }
 
-BioIKKinematicsQueryOptions::~BioIKKinematicsQueryOptions() {
+inline BioIKKinematicsQueryOptions::~BioIKKinematicsQueryOptions() {
   std::lock_guard<std::mutex> lock(bioIKKinematicsQueryOptionsMutex);
   bioIKKinematicsQueryOptionsList.erase(this);
 }
 
-bool isBioIKKinematicsQueryOptions(const void *ptr) {
+inline bool isBioIKKinematicsQueryOptions(const void *ptr) {
   std::lock_guard<std::mutex> lock(bioIKKinematicsQueryOptionsMutex);
   return bioIKKinematicsQueryOptionsList.find(ptr) !=
          bioIKKinematicsQueryOptionsList.end();
 }
 
-const BioIKKinematicsQueryOptions *
+inline const BioIKKinematicsQueryOptions *
 toBioIKKinematicsQueryOptions(const void *ptr) {
   if (isBioIKKinematicsQueryOptions(ptr))
     return (const BioIKKinematicsQueryOptions *)ptr;

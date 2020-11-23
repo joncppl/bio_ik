@@ -6,12 +6,18 @@
 
 #include "bio_ik/utils.h"
 
+namespace bio_ik
+{
+std::mutex bioIKKinematicsQueryOptionsMutex;
+std::unordered_set<const void *> bioIKKinematicsQueryOptionsList;
+}
+
 using namespace bio_ik;
 
 namespace bio_ik_kinematics_plugin
 {
 
-static rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_kdl_kinematics_plugin.kdl_kinematics_plugin");
+static rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_kdl_kinematics_plugin.bio_ik_kinematics_plugin");
 
 bool BioIKKinematicsPlugin::initialize(const rclcpp::Node::SharedPtr& node, const moveit::core::RobotModel& robot_model,
   const std::string& group_name, const std::string& base_frame,
