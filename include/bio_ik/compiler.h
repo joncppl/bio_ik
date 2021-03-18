@@ -91,6 +91,7 @@ BIO_IK_FORCE_INLINE int posix_memalign(void **ptr, size_t align, size_t size)
 #  define BIO_IK_EXTERN __declspec(dllexport)
 # else // BIO_IK_BUILDING
 #  define BIO_IK_EXTERN __declspec(dllimport)
+# endif // BIO_IK_BUILDING
 #else // _WIN32
 # define BIO_IK_EXTERN
 #endif // _WIN32
