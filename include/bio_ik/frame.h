@@ -42,6 +42,8 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_kdl/tf2_kdl.h>
 
+#include <bio_ik/compiler.h>
+
 namespace bio_ik
 {
 
@@ -51,7 +53,11 @@ typedef tf2::Vector3 Vector3;
 struct Frame
 {
     Vector3 pos;
+#ifdef __GNUC__
     double __padding[4 - (sizeof(Vector3) / sizeof(double))];
+#else
+    static_assert((4 - sizeof(Vector3) / sizeof(double)) == 0, "Padding necessary...");
+#endif
     Quaternion rot;
     inline Frame() {}
     inline Frame(const tf2::Vector3& pos, const tf2::Quaternion& rot)
@@ -105,7 +111,7 @@ template <size_t i> const Frame Frame::IdentityFrameTemplate<i>::identity_frame(
 
 static std::ostream& operator<<(std::ostream& os, const Frame& f) { return os << "(" << f.pos.x() << "," << f.pos.y() << "," << f.pos.z() << ";" << f.rot.x() << "," << f.rot.y() << "," << f.rot.z() << "," << f.rot.w() << ")"; }
 
-__attribute__((always_inline)) inline void quat_mul_vec(const tf2::Quaternion& q, const tf2::Vector3& v, tf2::Vector3& r)
+BIO_IK_FORCE_INLINE void quat_mul_vec(const tf2::Quaternion& q, const tf2::Vector3& v, tf2::Vector3& r)
 {
     double v_x = v.x();
     double v_y = v.y();
@@ -148,7 +154,7 @@ __attribute__((always_inline)) inline void quat_mul_vec(const tf2::Quaternion& q
     r.setZ(r_z);
 }
 
-__attribute__((always_inline)) inline void quat_mul_quat(const tf2::Quaternion& p, const tf2::Quaternion& q, tf2::Quaternion& r)
+BIO_IK_FORCE_INLINE void quat_mul_quat(const tf2::Quaternion& p, const tf2::Quaternion& q, tf2::Quaternion& r)
 {
     double p_x = p.x();
     double p_y = p.y();
@@ -171,7 +177,7 @@ __attribute__((always_inline)) inline void quat_mul_quat(const tf2::Quaternion& 
     r.setW(r_w);
 }
 
-__attribute__((always_inline)) inline void concat(const Frame& a, const Frame& b, Frame& r)
+BIO_IK_FORCE_INLINE void concat(const Frame& a, const Frame& b, Frame& r)
 {
     tf2::Vector3 d;
     quat_mul_vec(a.rot, b.pos, d);
@@ -179,14 +185,14 @@ __attribute__((always_inline)) inline void concat(const Frame& a, const Frame& b
     quat_mul_quat(a.rot, b.rot, r.rot);
 }
 
-__attribute__((always_inline)) inline void concat(const Frame& a, const Frame& b, const Frame& c, Frame& r)
+BIO_IK_FORCE_INLINE void concat(const Frame& a, const Frame& b, const Frame& c, Frame& r)
 {
     Frame tmp;
     concat(a, b, tmp);
     concat(tmp, c, r);
 }
 
-__attribute__((always_inline)) inline void quat_inv(const tf2::Quaternion& q, tf2::Quaternion& r)
+BIO_IK_FORCE_INLINE void quat_inv(const tf2::Quaternion& q, tf2::Quaternion& r)
 {
     r.setX(-q.x());
     r.setY(-q.y());
@@ -194,41 +200,41 @@ __attribute__((always_inline)) inline void quat_inv(const tf2::Quaternion& q, tf
     r.setW(q.w());
 }
 
-__attribute__((always_inline)) inline void invert(const Frame& a, Frame& r)
+BIO_IK_FORCE_INLINE void invert(const Frame& a, Frame& r)
 {
     Frame tmp;
     quat_inv(a.rot, r.rot);
     quat_mul_vec(r.rot, -a.pos, r.pos);
 }
 
-__attribute__((always_inline)) inline void change(const Frame& a, const Frame& b, const Frame& c, Frame& r)
+BIO_IK_FORCE_INLINE void change(const Frame& a, const Frame& b, const Frame& c, Frame& r)
 {
     Frame tmp;
     invert(b, tmp);
     concat(a, tmp, c, r);
 }
 
-__attribute__((always_inline)) inline Frame inverse(const Frame& f)
+BIO_IK_FORCE_INLINE Frame inverse(const Frame& f)
 {
     Frame r;
     invert(f, r);
     return r;
 }
 
-__attribute__((always_inline)) inline Frame operator*(const Frame& a, const Frame& b)
+BIO_IK_FORCE_INLINE Frame operator*(const Frame& a, const Frame& b)
 {
     Frame r;
     concat(a, b, r);
     return r;
 }
 
-__attribute__((always_inline)) inline Frame& operator*=(Frame& a, const Frame& b)
+BIO_IK_FORCE_INLINE Frame& operator*=(Frame& a, const Frame& b)
 {
     a = a * b;
     return a;
 }
 
-__attribute__((always_inline)) inline void normalizeFast(Quaternion& q)
+BIO_IK_FORCE_INLINE void normalizeFast(Quaternion& q)
 {
     double f = (3.0 - q.length2()) * 0.5;
     q.setX(q.x() * f);
@@ -237,7 +243,7 @@ __attribute__((always_inline)) inline void normalizeFast(Quaternion& q)
     q.setW(q.w() * f);
 }
 
-__attribute__((always_inline)) inline KDL::Twist frameTwist(const Frame& a, const Frame& b)
+BIO_IK_FORCE_INLINE KDL::Twist frameTwist(const Frame& a, const Frame& b)
 {
     auto frame = inverse(a) * b;
     KDL::Twist t;

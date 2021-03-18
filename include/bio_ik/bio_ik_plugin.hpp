@@ -38,6 +38,7 @@
 #include <bio_ik/ik_base.h>
 #include <bio_ik/ik_parallel.h>
 #include <bio_ik/problem.h>
+#include <bio_ik/compiler.h>
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
@@ -67,8 +68,8 @@
 
 namespace bio_ik {
 
-extern std::mutex bioIKKinematicsQueryOptionsMutex;
-extern std::unordered_set<const void *> bioIKKinematicsQueryOptionsList;
+BIO_IK_EXTERN extern std::mutex bioIKKinematicsQueryOptionsMutex;
+BIO_IK_EXTERN extern std::unordered_set<const void *> bioIKKinematicsQueryOptionsList;
 
 inline BioIKKinematicsQueryOptions::BioIKKinematicsQueryOptions()
     : replace(false), solution_fitness(0) {

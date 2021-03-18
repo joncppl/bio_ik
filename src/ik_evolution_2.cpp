@@ -239,21 +239,22 @@ template <int memetic> struct IKEvolution2 : IKBase
     // aligned_vector<double> rmask;
 
     // create offspring and mutate
-    __attribute__((hot)) __attribute__((noinline))
+    // __attribute__((hot)) __attribute__((noinline))
+    [[gnu::hot]] [[noinline]]
     //__attribute__((target_clones("avx2", "avx", "sse2", "default")))
     //__attribute__((target("avx")))
     void
     reproduce(const std::vector<Individual>& population)
     {
-        const auto __attribute__((aligned(32)))* __restrict__ genes_span = this->genes_span.data();
-        const auto __attribute__((aligned(32)))* __restrict__ genes_min = this->genes_min.data();
-        const auto __attribute__((aligned(32)))* __restrict__ genes_max = this->genes_max.data();
+        alignas(32) const auto* BIO_IK_RESTRICT genes_span = this->genes_span.data();
+        alignas(32) const auto* BIO_IK_RESTRICT genes_min = this->genes_min.data();
+        alignas(32) const auto* BIO_IK_RESTRICT genes_max = this->genes_max.data();
 
         auto gene_count = children[0].genes.size();
 
         size_t s = (children.size() - population.size()) * gene_count + children.size() * 4 + 4;
 
-        auto* __restrict__ rr = fast_random_gauss_n(s);
+        auto* BIO_IK_RESTRICT rr = fast_random_gauss_n(s);
         rr = (const double*)(((size_t)rr + 3) / 4 * 4);
 
         /*rmask.resize(s);
@@ -268,19 +269,21 @@ template <int memetic> struct IKEvolution2 : IKBase
             double fmix = (child_index % 2 == 0) * 0.2;
             double gradient_factor = child_index % 3;
 
-            auto __attribute__((aligned(32)))* __restrict__ parent_genes = parent.genes.data();
-            auto __attribute__((aligned(32)))* __restrict__ parent_gradients = parent.gradients.data();
+            alignas(32) auto* BIO_IK_RESTRICT parent_genes = parent.genes.data();
+            alignas(32) auto* BIO_IK_RESTRICT parent_gradients = parent.gradients.data();
 
-            auto __attribute__((aligned(32)))* __restrict__ parent2_genes = parent2.genes.data();
-            auto __attribute__((aligned(32)))* __restrict__ parent2_gradients = parent2.gradients.data();
+            alignas(32) auto* BIO_IK_RESTRICT parent2_genes = parent2.genes.data();
+            alignas(32) auto* BIO_IK_RESTRICT parent2_gradients = parent2.gradients.data();
 
             auto& child = children[child_index];
 
-            auto __attribute__((aligned(32)))* __restrict__ child_genes = child.genes.data();
-            auto __attribute__((aligned(32)))* __restrict__ child_gradients = child.gradients.data();
+            alignas(32) auto* BIO_IK_RESTRICT child_genes = child.genes.data();
+            alignas(32) auto* BIO_IK_RESTRICT child_gradients = child.gradients.data();
 
 #pragma omp simd aligned(genes_span : 32), aligned(genes_min : 32), aligned(genes_max : 32), aligned(parent_genes : 32), aligned(parent_gradients : 32), aligned(parent2_genes : 32), aligned(parent2_gradients : 32), aligned(child_genes : 32), aligned(child_gradients : 32) aligned(rr : 32)
+#ifndef _MSC_VER
 #pragma unroll
+#endif
             for(size_t gene_index = 0; gene_index < gene_count; gene_index++)
             {
                 // double mutation_rate = (1 << fast_random_index(16)) * (1.0 / (1 << 23));

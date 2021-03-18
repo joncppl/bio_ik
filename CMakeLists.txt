@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(bio_ik)
 
-if(NOT "${CMAKE_CXX_STANDARD}")
-    set(CMAKE_CXX_STANDARD 14)
-endif()
+
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -20,7 +19,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_eigen REQUIRED)
 find_package(tf2_kdl REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
-find_package(Boost REQUIRED COMPONENTS thread)
+find_package(Boost REQUIRED COMPONENTS thread date_time chrono)
 
 find_package(OpenMP)
 # the specific flag is not yet present in cmake 2.8.12
@@ -33,6 +32,9 @@ if (OpenMP_CXX_FOUND OR OPENMP_FOUND)
     else ()
         set(OpenMP_LIBS ${OpenMP_CXX_LIBRARIES})
     endif ()
+    if (MSVC)
+        add_compile_options(-openmp:experimental)
+    endif()
 else ()
     message(WARNING "OPENMP NOT FOUND. You will suffer performance loss.")
     set(OpenMP_LIBS)
@@ -71,11 +73,11 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-frecord-gcc-switches)
 endif ()
 
-add_compile_options(-std=c++11)
+add_compile_options($<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU>>:-O3>)
+add_compile_options($<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU>>:-ftree-vectorize>)
+add_compile_options($<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU>>:-ffast-math>)
 
-add_compile_options($<$<CONFIG:Release>:-O3>)
-add_compile_options($<$<CONFIG:Release>:-ftree-vectorize>)
-add_compile_options($<$<CONFIG:Release>:-ffast-math>)
+add_compile_options($<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:MSVC>>:/O2>)
 
 include_directories(
         include
@@ -104,6 +106,8 @@ endif ()
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE BIO_IK_BUILDING)
+
 ament_target_dependencies(${PROJECT_NAME}
         PUBLIC
         moveit_core
@@ -114,7 +118,7 @@ ament_target_dependencies(${PROJECT_NAME}
         tf2_kdl
         tf2_geometry_msgs)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${Boost_THREAD_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${Boost_THREAD_LIBRARIES} ${Boost_DATE_TIME_LIBRARIES} ${Boost_CHRONO_LIBRARIES})
 
 # prevent pluginlib from using boost
 target_compile_definitions(${PROJECT_NAME} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
@@ -124,11 +128,15 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "MOVEIT_KDL_KINEMATICS_PLUGIN
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
   ${FANN_LIBRARIES}
-  ${OpenMP_LIBS}
-
-  -static-libgcc
-  -static-libstdc++
 )
+
+if("${CMAKE_SYSTEM}" MATCHES "Linux")
+    target_link_libraries(${PROJECT_NAME} PUBLIC
+        ${OpenMP_LIBS}  
+        -static-libgcc
+        -static-libstdc++
+        )
+endif()
 
 install(TARGETS ${PROJECT_NAME}
         EXPORT ${PROJECT_NAME}
