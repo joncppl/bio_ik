@@ -14,29 +14,29 @@ namespace bio_ik
 {
 
 template<size_t>
-struct UnsignedForSize
+struct SignedForSize
 {};
 
 template<>
-struct UnsignedForSize<2>
+struct SignedForSize<2>
 {
-    using type = uint16_t;
+    using type = int16_t;
 };
 
 template<>
-struct UnsignedForSize<4>
+struct SignedForSize<4>
 {
-    using type = uint32_t;
+    using type = int32_t;
 };
 
 template<>
-struct UnsignedForSize<8>
+struct SignedForSize<8>
 {
-    using type = uint64_t;
+    using type = int64_t;
 };
 
 #ifndef __linux__
-using ssize_t = typename UnsignedForSize<sizeof(size_t)>::type;
+using ssize_t = typename SignedForSize<sizeof(size_t)>::type;
 #endif
 
 
