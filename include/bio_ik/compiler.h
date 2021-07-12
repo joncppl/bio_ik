@@ -3,7 +3,7 @@
 #include <cstddef>
 
 #ifdef __GNUC__
-# define BIO_IK_FORCE_INLINE __attribute__((always_inline))
+# define BIO_IK_FORCE_INLINE __attribute__((always_inline)) inline
 #elif defined(_MSC_VER)
 # define BIO_IK_FORCE_INLINE  __forceinline
 #else
@@ -71,8 +71,8 @@ BIO_IK_FORCE_INLINE int posix_memalign(void **ptr, size_t align, size_t size)
 }
 
 #ifdef __GNUC__
-# define BIO_IK_LIKELY(x) (__builtin__expect((x), 1))
-# define BIO_IK_UNLIKELY(x) (__builtin__expect((x), 0))
+# define BIO_IK_LIKELY(x) (__builtin_expect((x), 1))
+# define BIO_IK_UNLIKELY(x) (__builtin_expect((x), 0))
 #else
 # define BIO_IK_LIKELY(x) (x)
 # define BIO_IK_UNLIKELY(x) (x)
