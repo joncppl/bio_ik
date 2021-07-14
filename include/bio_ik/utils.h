@@ -171,13 +171,13 @@ static ProfilerInfo& profiler_info = getProfilerInfo();
 // profiles a scope or function
 template <size_t ID> struct ProfilerScope
 {
-    BIO_IK_FORCE_INLINE ProfilerScope(const char* name)
+    BIO_IK_FORCE_INLINE inline ProfilerScope(const char* name)
     {
         if(profiler_info.stack_begin == 0) return;
         if(this < profiler_info.stack_begin || this > profiler_info.stack_end) return;
         profiler_segment[ID].name = name;
     }
-    BIO_IK_FORCE_INLINE ~ProfilerScope()
+    BIO_IK_FORCE_INLINE inline ~ProfilerScope()
     {
         if(profiler_info.stack_begin == 0) return;
         if(this < profiler_info.stack_begin || this > profiler_info.stack_end) return;
@@ -191,13 +191,13 @@ template <size_t ID> struct ProfilerScope
 struct ThreadScope
 {
     size_t id;
-    BIO_IK_FORCE_INLINE ThreadScope(const char* name, size_t id)
+    BIO_IK_FORCE_INLINE inline ThreadScope(const char* name, size_t id)
         : id(id)
     {
         if(profiler_info.stack_begin == 0) return;
         profiler_segment[id].name = name;
     }
-    BIO_IK_FORCE_INLINE ~ThreadScope()
+    BIO_IK_FORCE_INLINE inline ~ThreadScope()
     {
         if(profiler_info.stack_begin == 0) return;
         profiler_segment[id].name = 0;
@@ -212,13 +212,13 @@ struct ThreadScope
 struct CounterScope
 {
     size_t id;
-    BIO_IK_FORCE_INLINE CounterScope(const char* name, size_t id)
+    BIO_IK_FORCE_INLINE inline CounterScope(const char* name, size_t id)
         : id(id)
     {
         if(profiler_info.stack_begin == 0) return;
         if((profiler_segment[id].counter++) == 0) profiler_segment[id].name = name;
     }
-    BIO_IK_FORCE_INLINE ~CounterScope()
+    BIO_IK_FORCE_INLINE inline ~CounterScope()
     {
         if(profiler_info.stack_begin == 0) return;
         if((--profiler_segment[id].counter) == 0) profiler_segment[id].name = 0;
@@ -307,29 +307,29 @@ struct Profiler
 
 #endif
 
-BIO_IK_FORCE_INLINE double mix(double a, double b, double f) { return a * (1.0 - f) + b * f; }
+BIO_IK_FORCE_INLINE inline double mix(double a, double b, double f) { return a * (1.0 - f) + b * f; }
 
-BIO_IK_FORCE_INLINE double clamp(double v, double lo, double hi)
+BIO_IK_FORCE_INLINE inline double clamp(double v, double lo, double hi)
 {
     if(v < lo) v = lo;
     if(v > hi) v = hi;
     return v;
 }
 
-BIO_IK_FORCE_INLINE double clamp2(double v, double lo, double hi)
+BIO_IK_FORCE_INLINE inline double clamp2(double v, double lo, double hi)
 {
     if(BIO_IK_UNLIKELY(v < lo)) v = lo;
     if(BIO_IK_UNLIKELY(v > hi)) v = hi;
     return v;
 }
 
-BIO_IK_FORCE_INLINE double smoothstep(float a, float b, float v)
+BIO_IK_FORCE_INLINE inline double smoothstep(float a, float b, float v)
 {
     v = clamp((v - a) / (b - a), 0.0, 1.0);
     return v * v * (3.0 - 2.0 * v);
 }
 
-BIO_IK_FORCE_INLINE double sign(double f)
+BIO_IK_FORCE_INLINE inline double sign(double f)
 {
     if(f < 0.0) f = -1.0;
     if(f > 0.0) f = +1.0;
@@ -366,7 +366,7 @@ public:
         : v(88172645463325252ull)
     {
     }
-    BIO_IK_FORCE_INLINE uint64_t operator()()
+    BIO_IK_FORCE_INLINE inline uint64_t operator()()
     {
         v ^= v << 13;
         v ^= v >> 7;

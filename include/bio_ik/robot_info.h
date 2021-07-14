@@ -59,7 +59,7 @@ class RobotInfo
     std::vector<moveit::core::JointModel::JointType> variable_joint_types;
     moveit::core::RobotModelConstPtr robot_model;
 
-    BIO_IK_FORCE_INLINE static double clamp2(double v, double lo, double hi)
+    BIO_IK_FORCE_INLINE inline static double clamp2(double v, double lo, double hi)
     {
         if(BIO_IK_UNLIKELY(v < lo)) v = lo;
         if(BIO_IK_UNLIKELY(v > hi)) v = hi;
@@ -107,7 +107,7 @@ public:
     }
 
 public:
-    BIO_IK_FORCE_INLINE double clip(double p, size_t i) const
+    BIO_IK_FORCE_INLINE inline double clip(double p, size_t i) const
     {
         auto& info = variables[i];
         return clamp2(p, info.clip_min, info.clip_max);

@@ -111,7 +111,7 @@ template <size_t i> const Frame Frame::IdentityFrameTemplate<i>::identity_frame(
 
 static std::ostream& operator<<(std::ostream& os, const Frame& f) { return os << "(" << f.pos.x() << "," << f.pos.y() << "," << f.pos.z() << ";" << f.rot.x() << "," << f.rot.y() << "," << f.rot.z() << "," << f.rot.w() << ")"; }
 
-BIO_IK_FORCE_INLINE void quat_mul_vec(const tf2::Quaternion& q, const tf2::Vector3& v, tf2::Vector3& r)
+BIO_IK_FORCE_INLINE inline void quat_mul_vec(const tf2::Quaternion& q, const tf2::Vector3& v, tf2::Vector3& r)
 {
     double v_x = v.x();
     double v_y = v.y();
@@ -154,7 +154,7 @@ BIO_IK_FORCE_INLINE void quat_mul_vec(const tf2::Quaternion& q, const tf2::Vecto
     r.setZ(r_z);
 }
 
-BIO_IK_FORCE_INLINE void quat_mul_quat(const tf2::Quaternion& p, const tf2::Quaternion& q, tf2::Quaternion& r)
+BIO_IK_FORCE_INLINE inline void quat_mul_quat(const tf2::Quaternion& p, const tf2::Quaternion& q, tf2::Quaternion& r)
 {
     double p_x = p.x();
     double p_y = p.y();
@@ -177,7 +177,7 @@ BIO_IK_FORCE_INLINE void quat_mul_quat(const tf2::Quaternion& p, const tf2::Quat
     r.setW(r_w);
 }
 
-BIO_IK_FORCE_INLINE void concat(const Frame& a, const Frame& b, Frame& r)
+BIO_IK_FORCE_INLINE inline void concat(const Frame& a, const Frame& b, Frame& r)
 {
     tf2::Vector3 d;
     quat_mul_vec(a.rot, b.pos, d);
@@ -185,14 +185,14 @@ BIO_IK_FORCE_INLINE void concat(const Frame& a, const Frame& b, Frame& r)
     quat_mul_quat(a.rot, b.rot, r.rot);
 }
 
-BIO_IK_FORCE_INLINE void concat(const Frame& a, const Frame& b, const Frame& c, Frame& r)
+BIO_IK_FORCE_INLINE inline void concat(const Frame& a, const Frame& b, const Frame& c, Frame& r)
 {
     Frame tmp;
     concat(a, b, tmp);
     concat(tmp, c, r);
 }
 
-BIO_IK_FORCE_INLINE void quat_inv(const tf2::Quaternion& q, tf2::Quaternion& r)
+BIO_IK_FORCE_INLINE inline void quat_inv(const tf2::Quaternion& q, tf2::Quaternion& r)
 {
     r.setX(-q.x());
     r.setY(-q.y());
@@ -200,41 +200,41 @@ BIO_IK_FORCE_INLINE void quat_inv(const tf2::Quaternion& q, tf2::Quaternion& r)
     r.setW(q.w());
 }
 
-BIO_IK_FORCE_INLINE void invert(const Frame& a, Frame& r)
+BIO_IK_FORCE_INLINE inline void invert(const Frame& a, Frame& r)
 {
     Frame tmp;
     quat_inv(a.rot, r.rot);
     quat_mul_vec(r.rot, -a.pos, r.pos);
 }
 
-BIO_IK_FORCE_INLINE void change(const Frame& a, const Frame& b, const Frame& c, Frame& r)
+BIO_IK_FORCE_INLINE inline void change(const Frame& a, const Frame& b, const Frame& c, Frame& r)
 {
     Frame tmp;
     invert(b, tmp);
     concat(a, tmp, c, r);
 }
 
-BIO_IK_FORCE_INLINE Frame inverse(const Frame& f)
+BIO_IK_FORCE_INLINE inline Frame inverse(const Frame& f)
 {
     Frame r;
     invert(f, r);
     return r;
 }
 
-BIO_IK_FORCE_INLINE Frame operator*(const Frame& a, const Frame& b)
+BIO_IK_FORCE_INLINE inline Frame operator*(const Frame& a, const Frame& b)
 {
     Frame r;
     concat(a, b, r);
     return r;
 }
 
-BIO_IK_FORCE_INLINE Frame& operator*=(Frame& a, const Frame& b)
+BIO_IK_FORCE_INLINE inline Frame& operator*=(Frame& a, const Frame& b)
 {
     a = a * b;
     return a;
 }
 
-BIO_IK_FORCE_INLINE void normalizeFast(Quaternion& q)
+BIO_IK_FORCE_INLINE inline void normalizeFast(Quaternion& q)
 {
     double f = (3.0 - q.length2()) * 0.5;
     q.setX(q.x() * f);
@@ -243,7 +243,7 @@ BIO_IK_FORCE_INLINE void normalizeFast(Quaternion& q)
     q.setW(q.w() * f);
 }
 
-BIO_IK_FORCE_INLINE KDL::Twist frameTwist(const Frame& a, const Frame& b)
+BIO_IK_FORCE_INLINE inline KDL::Twist frameTwist(const Frame& a, const Frame& b)
 {
     auto frame = inverse(a) * b;
     KDL::Twist t;

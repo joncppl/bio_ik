@@ -3,7 +3,7 @@
 #include <cstddef>
 
 #ifdef __GNUC__
-# define BIO_IK_FORCE_INLINE __attribute__((always_inline)) inline
+# define BIO_IK_FORCE_INLINE __attribute__((always_inline))
 #elif defined(_MSC_VER)
 # define BIO_IK_FORCE_INLINE  __forceinline
 #else
@@ -42,7 +42,7 @@ using ssize_t = typename SignedForSize<sizeof(size_t)>::type;
 
 
 #ifdef _WIN32
-BIO_IK_FORCE_INLINE int check_align(size_t align)
+BIO_IK_FORCE_INLINE inline int check_align(size_t align)
 {
     for (size_t i = sizeof(void *); i != 0; i *= 2)
     if (align == i)
@@ -50,7 +50,7 @@ BIO_IK_FORCE_INLINE int check_align(size_t align)
     return EINVAL;
 }
 
-BIO_IK_FORCE_INLINE int posix_memalign(void **ptr, size_t align, size_t size)
+BIO_IK_FORCE_INLINE inline int posix_memalign(void **ptr, size_t align, size_t size)
 {
     if (check_align(align))
         return EINVAL;
