@@ -39,6 +39,7 @@
 #include <moveit/robot_state/robot_state.h>
 
 #include <bio_ik/goal.h>
+#include <bio_ik/compiler.h>
 
 namespace bio_ik
 {
@@ -58,10 +59,10 @@ class RobotInfo
     std::vector<moveit::core::JointModel::JointType> variable_joint_types;
     moveit::core::RobotModelConstPtr robot_model;
 
-    __attribute__((always_inline)) static inline double clamp2(double v, double lo, double hi)
+    BIO_IK_FORCE_INLINE inline static double clamp2(double v, double lo, double hi)
     {
-        if(__builtin_expect(v < lo, 0)) v = lo;
-        if(__builtin_expect(v > hi, 0)) v = hi;
+        if(BIO_IK_UNLIKELY(v < lo)) v = lo;
+        if(BIO_IK_UNLIKELY(v > hi)) v = hi;
         return v;
     }
 
@@ -106,7 +107,7 @@ public:
     }
 
 public:
-    __attribute__((always_inline)) inline double clip(double p, size_t i) const
+    BIO_IK_FORCE_INLINE inline double clip(double p, size_t i) const
     {
         auto& info = variables[i];
         return clamp2(p, info.clip_min, info.clip_max);
